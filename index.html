@@ -7,10 +7,13 @@
     <title>Portfolio | Cloud & Infrastructure Engineer</title>
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Three.js for 3D effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         /* ===== RESET & BASE STYLES ===== */
@@ -30,15 +33,69 @@
             color: #e0e0e0;
             line-height: 1.6;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ===== 3D CANVAS BACKGROUND ===== */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #three-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Lightning Flash Effect */
+        .lightning-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 212, 255, 0.05);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            transition: opacity 0.05s;
+        }
+
+        .lightning-flash.active {
+            opacity: 1;
+        }
+
+        /* Terminal Code Overlay */
+        .terminal-code {
+            position: fixed;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: rgba(0, 255, 100, 0.5);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+            text-shadow: 0 0 8px rgba(0, 255, 100, 0.6);
+            font-weight: 400;
+        }
+
+        /* Content above canvas */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
         }
 
         /* ===== VARIABLES ===== */
         :root {
             --primary-accent: #00d4ff;
             --secondary-accent: #ff0080;
-            --bg-dark: #0a0a0a;
-            --bg-darker: #050505;
-            --bg-card: #151515;
+            --bg-dark: rgba(10, 10, 10, 0.85);
+            --bg-darker: rgba(5, 5, 5, 0.9);
+            --bg-card: rgba(21, 21, 21, 0.85);
             --text-primary: #ffffff;
             --text-secondary: #b0b0b0;
             --text-muted: #707070;
@@ -93,6 +150,12 @@
             z-index: 1000;
             padding: 1rem 0;
             border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .nav.scrolled {
+            background: rgba(10, 10, 10, 0.98);
+            box-shadow: 0 5px 30px rgba(0, 212, 255, 0.1);
         }
 
         .nav .container {
@@ -110,6 +173,11 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
         }
 
         .nav-links {
@@ -152,27 +220,8 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 100%);
             overflow: hidden;
             padding-top: 80px;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 0, 128, 0.1) 0%, transparent 50%);
-            animation: pulse 8s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
         }
 
         .hero-content {
@@ -270,6 +319,7 @@
         /* ===== SECTIONS ===== */
         section {
             padding: 6rem 0;
+            position: relative;
         }
 
         section:nth-child(even) {
@@ -281,6 +331,10 @@
             max-width: 800px;
             margin: 0 auto;
             text-align: center;
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            background: rgba(21, 21, 21, 0.5);
         }
 
         .about-content p {
@@ -295,12 +349,82 @@
             font-weight: 600;
         }
 
+        /* ===== TECH STACK SECTION ===== */
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        .tech-item {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(21, 21, 21, 0.7) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(10px);
+            position: relative;
+            transform-style: preserve-3d;
+            box-shadow:
+                5px 5px 15px rgba(0, 0, 0, 0.3),
+                -2px -2px 8px rgba(255, 255, 255, 0.03);
+        }
+
+        .tech-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(255, 0, 128, 0.1) 100%);
+            border-radius: 12px;
+            opacity: 0;
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .tech-item i {
+            color: var(--primary-accent);
+            font-size: 1.3rem;
+            transition: var(--transition);
+            filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.5));
+        }
+
+        .tech-item:hover {
+            border-color: var(--primary-accent);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(255, 0, 128, 0.1) 100%);
+            transform: translateY(-8px);
+            box-shadow:
+                8px 15px 30px rgba(0, 212, 255, 0.4),
+                -3px -3px 15px rgba(255, 255, 255, 0.05),
+                0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .tech-item:hover::before {
+            opacity: 1;
+        }
+
+        .tech-item:hover i {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.8));
+        }
+
         /* ===== CERTIFICATIONS SECTION ===== */
         .cert-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             margin-top: 3rem;
+            perspective: 1000px;
         }
 
         .cert-card {
@@ -311,6 +435,7 @@
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .cert-card::before {
@@ -331,15 +456,23 @@
         }
 
         .cert-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-20px);
             border-color: var(--primary-accent);
-            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.2);
+            box-shadow: 0 30px 60px rgba(0, 212, 255, 0.5), 0 0 30px rgba(0, 212, 255, 0.3);
         }
 
         .cert-icon {
             font-size: 2.5rem;
             color: var(--primary-accent);
             margin-bottom: 1rem;
+            transition: var(--transition);
+            display: inline-block;
+            text-align: center;
+        }
+
+        .cert-card:hover .cert-icon {
+            transform: scale(1.15);
+            text-shadow: 0 0 20px var(--primary-accent), 0 0 30px var(--primary-accent);
         }
 
         .cert-card h3 {
@@ -374,12 +507,13 @@
             padding: 2.5rem;
             transition: var(--transition);
             position: relative;
+            backdrop-filter: blur(10px);
         }
 
         .service-card:hover {
             border-color: var(--primary-accent);
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.2);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 212, 255, 0.3);
         }
 
         .service-icon {
@@ -392,6 +526,12 @@
             justify-content: center;
             font-size: 1.8rem;
             margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .service-card:hover .service-icon {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
         }
 
         .service-card h3 {
@@ -418,41 +558,6 @@
             border-radius: 15px;
             font-size: 0.75rem;
             color: var(--text-secondary);
-        }
-
-        /* ===== TECH STACK SECTION ===== */
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 3rem;
-        }
-
-        .tech-item {
-            padding: 0.8rem 1.5rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 25px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .tech-item i {
-            color: var(--primary-accent);
-            font-size: 1.2rem;
-        }
-
-        .tech-item:hover {
-            border-color: var(--primary-accent);
-            background: rgba(0, 212, 255, 0.05);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
         }
 
         /* ===== CONTACT SECTION ===== */
@@ -485,17 +590,23 @@
             text-decoration: none;
             transition: var(--transition);
             font-weight: 500;
+            backdrop-filter: blur(10px);
         }
 
         .contact-link i {
             font-size: 1.5rem;
             color: var(--primary-accent);
+            transition: var(--transition);
         }
 
         .contact-link:hover {
             border-color: var(--primary-accent);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 212, 255, 0.3);
+        }
+
+        .contact-link:hover i {
+            transform: scale(1.2);
         }
 
         /* ===== FOOTER ===== */
@@ -557,280 +668,710 @@
         .reveal {
             opacity: 0;
             transform: translateY(30px);
-            transition: all 0.6s ease-out;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .reveal.active {
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* ===== LOADING ANIMATION ===== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 212, 255, 0.2);
+            border-top-color: var(--primary-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <!-- NAVIGATION -->
-    <nav class="nav">
-        <div class="container">
-            <a href="#" class="logo">Abhishek Gupta</a>
-            <ul class="nav-links">
-                <li><a href="#about">About</a></li>
-                <li><a href="#techstack">Tech Stack</a></li>
-                <li><a href="#certifications">Certifications</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </div>
-    </nav>
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loading">
+        <div class="loader"></div>
+    </div>
 
-    <!-- HERO SECTION -->
-    <section class="hero" id="home">
-        <div class="container hero-content">
-            <span class="hero-tag">Freelancer | Workshop Instructor</span>
-            <h1>Cloud & Infrastructure<br>Engineer</h1>
-            <p>Architecting resilient cloud infrastructure, container orchestration, and delivering technical workshops on Cloud Security, Blockchain, and Malware Analysis.</p>
-            <a href="#contact" class="cta-button">Let's Connect <i class="fas fa-arrow-right"></i></a>
-        </div>
-    </section>
+    <!-- LIGHTNING FLASH -->
+    <div class="lightning-flash" id="lightningFlash"></div>
 
-    <!-- ABOUT SECTION -->
-    <section id="about">
-        <div class="container">
-            <div class="about-content reveal">
-                <h2>About Me</h2>
-                <p>
-                    I'm a Cloud & Infrastructure Engineer specializing in container orchestration, cloud infrastructure, and storage solutions.
-                    My expertise spans <span class="highlight">Kubernetes, OpenShift, Ceph, and AWS</span>, with a deep focus on building
-                    resilient, scalable enterprise systems. Currently working at <span class="highlight">Red Hat</span>, I architect and
-                    implement cutting-edge cloud-native solutions.
-                </p>
-                <p>
-                    As a freelancer, I'm passionate about sharing knowledge through <span class="highlight">technical workshops for colleges</span>,
-                    covering topics like Cloud Security, Blockchain, and Malware Analysis. With certifications from Red Hat, AWS, Microsoft Azure,
-                    and the Cloud Native Computing Foundation, I bring comprehensive expertise across multiple cloud platforms and DevOps technologies.
-                </p>
+    <!-- 3D CANVAS BACKGROUND -->
+    <div id="canvas-container">
+        <canvas id="three-canvas"></canvas>
+    </div>
+
+    <!-- CONTENT WRAPPER -->
+    <div class="content-wrapper">
+        <!-- NAVIGATION -->
+        <nav class="nav" id="navbar">
+            <div class="container">
+                <a href="#" class="logo">Abhishek Gupta</a>
+                <ul class="nav-links">
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#techstack">Tech Stack</a></li>
+                    <li><a href="#certifications">Certifications</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
             </div>
-        </div>
-    </section>
+        </nav>
 
-    <!-- TECH STACK SECTION -->
-    <section id="techstack">
-        <div class="container">
-            <h2 class="reveal">Tech Stack</h2>
-            <div class="tech-stack reveal">
-                <div class="tech-item"><i class="fab fa-docker"></i> Docker</div>
-                <div class="tech-item"><i class="fas fa-cube"></i> Podman</div>
-                <div class="tech-item"><i class="fab fa-linux"></i> Linux</div>
-                <div class="tech-item"><i class="fab fa-git-alt"></i> Git</div>
-                <div class="tech-item"><i class="fab fa-github"></i> GitHub</div>
-                <div class="tech-item"><i class="fab fa-gitlab"></i> GitLab</div>
-                <div class="tech-item"><i class="fas fa-dharmachakra"></i> Kubernetes</div>
-                <div class="tech-item"><i class="fab fa-redhat"></i> OpenShift (OCP)</div>
-                <div class="tech-item"><i class="fas fa-database"></i> Ceph</div>
-                <div class="tech-item"><i class="fas fa-hdd"></i> ODF</div>
-                <div class="tech-item"><i class="fab fa-aws"></i> AWS</div>
-                <div class="tech-item"><i class="fas fa-cloud"></i> Cloud Computing</div>
-                <div class="tech-item"><i class="fas fa-shield-alt"></i> Cloud Security</div>
-                <div class="tech-item"><i class="fas fa-link"></i> Blockchain</div>
-                <div class="tech-item"><i class="fas fa-bug"></i> Malware Analysis</div>
-                <div class="tech-item"><i class="fas fa-cogs"></i> Ansible</div>
-                <div class="tech-item"><i class="fab fa-python"></i> Python</div>
-                <div class="tech-item"><i class="fas fa-terminal"></i> Bash</div>
+        <!-- HERO SECTION -->
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <span class="hero-tag">Freelancer | Workshop Instructor</span>
+                <h1>Cloud & Infrastructure<br>Engineer</h1>
+                <p>Architecting resilient cloud infrastructure, container orchestration, and delivering technical workshops on Cloud Security, Blockchain, and Malware Analysis.</p>
+                <a href="#contact" class="cta-button">Let's Connect <i class="fas fa-arrow-right"></i></a>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- CERTIFICATIONS SECTION -->
-    <section id="certifications">
-        <div class="container">
-            <h2 class="reveal">Certifications</h2>
-            <div class="cert-grid">
-                <!-- AWS Certifications -->
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fab fa-aws"></i></div>
-                    <h3>AWS Certified Solutions Architect Associate</h3>
-                    <span class="cert-badge">AWS SAA</span>
-                </div>
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fab fa-aws"></i></div>
-                    <h3>AWS Certified Cloud Practitioner</h3>
-                    <span class="cert-badge">AWS CCP</span>
-                </div>
-
-                <!-- Microsoft Azure Certifications -->
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fab fa-microsoft"></i></div>
-                    <h3>Microsoft Certified: Azure Administrator Associate</h3>
-                    <span class="cert-badge">Azure Admin</span>
-                </div>
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fab fa-microsoft"></i></div>
-                    <h3>Microsoft Certified: DevOps Engineer Expert</h3>
-                    <span class="cert-badge">Azure DevOps</span>
-                </div>
-
-                <!-- Kubernetes Certification -->
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fas fa-dharmachakra"></i></div>
-                    <h3>Certified Kubernetes Administrator (CKA)</h3>
-                    <span class="cert-badge">CNCF CKA</span>
-                </div>
-
-                <!-- Red Hat Certifications -->
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fas fa-server"></i></div>
-                    <h3>Red Hat Certified Engineer (RHCE) in Enterprise Linux</h3>
-                    <span class="cert-badge">RHCE</span>
-                </div>
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fas fa-cogs"></i></div>
-                    <h3>Red Hat Certified Engineer in Ansible Automation</h3>
-                    <span class="cert-badge">RHCE - Ansible</span>
-                </div>
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fas fa-linux"></i></div>
-                    <h3>Red Hat Certified System Administrator (RHCSA)</h3>
-                    <span class="cert-badge">RHCSA</span>
-                </div>
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fas fa-cubes"></i></div>
-                    <h3>Red Hat Certified System Administrator in OpenShift</h3>
-                    <span class="cert-badge">RHCSA - OCP</span>
-                </div>
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fas fa-box"></i></div>
-                    <h3>Red Hat Certified Specialist in Containers</h3>
-                    <span class="cert-badge">Containers</span>
-                </div>
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fas fa-cube"></i></div>
-                    <h3>Red Hat Certified OpenShift Administrator</h3>
-                    <span class="cert-badge">OpenShift Admin</span>
-                </div>
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fas fa-database"></i></div>
-                    <h3>Red Hat Certified Specialist in Ceph Cloud Storage</h3>
-                    <span class="cert-badge">Ceph Storage</span>
-                </div>
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fas fa-hdd"></i></div>
-                    <h3>Red Hat Certified Specialist in OpenShift Data Foundation</h3>
-                    <span class="cert-badge">ODF</span>
-                </div>
-                <div class="cert-card reveal">
-                    <div class="cert-icon"><i class="fas fa-robot"></i></div>
-                    <h3>Red Hat Certified Developer in AI</h3>
-                    <span class="cert-badge">Red Hat AI</span>
+        <!-- ABOUT SECTION -->
+        <section id="about">
+            <div class="container">
+                <div class="about-content reveal">
+                    <h2>About Me</h2>
+                    <p>
+                        I'm a Cloud & Infrastructure Engineer specializing in container orchestration, cloud infrastructure, and storage solutions.
+                        My expertise spans <span class="highlight">Kubernetes, OpenShift, Ceph, and AWS</span>, with a deep focus on building
+                        resilient, scalable enterprise systems. Currently working at <span class="highlight">Red Hat</span>, I architect and
+                        implement cutting-edge cloud-native solutions.
+                    </p>
+                    <p>
+                        As a freelancer, I'm passionate about sharing knowledge through <span class="highlight">technical workshops for colleges</span>,
+                        covering topics like Linux, Containerization, Cloud Computing, Kubernetes, Cloud Security, Blockchain, and Malware Analysis. With certifications from Red Hat, AWS, Microsoft Azure,
+                        and the Cloud Native Computing Foundation, I bring comprehensive expertise across multiple cloud platforms and DevOps technologies.
+                    </p>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- SERVICES SECTION -->
-    <section id="services">
-        <div class="container">
-            <h2 class="reveal">Services & Expertise</h2>
-            <div class="services-grid">
-                <div class="service-card reveal">
-                    <div class="service-icon">
-                        <i class="fas fa-cloud"></i>
-                    </div>
-                    <h3>Cloud & Container Orchestration</h3>
-                    <p>Expert in designing and deploying containerized applications using Kubernetes, OpenShift (OCP), Docker, and Podman with focus on scalability and high availability.</p>
-                    <div class="service-tags">
-                        <span class="service-tag">Kubernetes</span>
-                        <span class="service-tag">OpenShift</span>
-                        <span class="service-tag">Docker</span>
-                        <span class="service-tag">Podman</span>
-                        <span class="service-tag">AWS</span>
-                    </div>
+        <!-- TECH STACK SECTION -->
+        <section id="techstack">
+            <div class="container">
+                <h2 class="reveal">Tech Stack</h2>
+                <div class="tech-stack reveal">
+                    <div class="tech-item"><i class="fab fa-docker"></i> Docker</div>
+                    <div class="tech-item"><i class="fas fa-cube"></i> Podman</div>
+                    <div class="tech-item"><i class="fab fa-linux"></i> Linux</div>
+                    <div class="tech-item"><i class="fab fa-git-alt"></i> Git</div>
+                    <div class="tech-item"><i class="fab fa-github"></i> GitHub</div>
+                    <div class="tech-item"><i class="fab fa-gitlab"></i> GitLab</div>
+                    <div class="tech-item"><i class="fas fa-dharmachakra"></i> Kubernetes</div>
+                    <div class="tech-item"><i class="fab fa-redhat"></i> OpenShift (OCP)</div>
+                    <div class="tech-item"><i class="fas fa-database"></i> Ceph</div>
+                    <div class="tech-item"><i class="fas fa-hdd"></i> ODF</div>
+                    <div class="tech-item"><i class="fab fa-aws"></i> AWS</div>
+                    <div class="tech-item"><i class="fas fa-cloud"></i> Cloud Computing</div>
+                    <div class="tech-item"><i class="fas fa-shield-alt"></i> Cloud Security</div>
+                    <div class="tech-item"><i class="fas fa-link"></i> Blockchain</div>
+                    <div class="tech-item"><i class="fas fa-bug"></i> Malware Analysis</div>
+                    <div class="tech-item"><i class="fas fa-cogs"></i> Ansible</div>
+                    <div class="tech-item"><i class="fab fa-python"></i> Python</div>
+                    <div class="tech-item"><i class="fas fa-terminal"></i> Bash</div>
                 </div>
-                <div class="service-card reveal">
-                    <div class="service-icon">
-                        <i class="fas fa-database"></i>
+            </div>
+        </section>
+
+        <!-- CERTIFICATIONS SECTION -->
+        <section id="certifications">
+            <div class="container">
+                <h2 class="reveal">Certifications</h2>
+                <div class="cert-grid">
+                    <!-- AWS Certifications -->
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fab fa-aws"></i></div>
+                        <h3>AWS Certified Solutions Architect Associate</h3>
+                        <span class="cert-badge">AWS SAA</span>
                     </div>
-                    <h3>Cloud Storage & Data Foundation</h3>
-                    <p>Specialized in Ceph storage solutions, OpenShift Data Foundation (ODF), and enterprise-grade persistent storage for cloud-native applications.</p>
-                    <div class="service-tags">
-                        <span class="service-tag">Ceph</span>
-                        <span class="service-tag">ODF</span>
-                        <span class="service-tag">Storage</span>
-                        <span class="service-tag">Backup</span>
-                        <span class="service-tag">S3</span>
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fab fa-aws"></i></div>
+                        <h3>AWS Certified Cloud Practitioner</h3>
+                        <span class="cert-badge">AWS CCP</span>
                     </div>
-                </div>
-                <div class="service-card reveal">
-                    <div class="service-icon">
-                        <i class="fas fa-code-branch"></i>
+
+                    <!-- Microsoft Azure Certifications -->
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fab fa-microsoft"></i></div>
+                        <h3>Microsoft Certified: Azure Administrator Associate</h3>
+                        <span class="cert-badge">Azure Admin</span>
                     </div>
-                    <h3>DevOps & Automation</h3>
-                    <p>Infrastructure as Code, CI/CD pipelines, configuration management with Ansible, and automation across Linux, Git, GitHub, and GitLab environments.</p>
-                    <div class="service-tags">
-                        <span class="service-tag">Ansible</span>
-                        <span class="service-tag">Git</span>
-                        <span class="service-tag">GitHub</span>
-                        <span class="service-tag">GitLab</span>
-                        <span class="service-tag">Linux</span>
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fab fa-microsoft"></i></div>
+                        <h3>Microsoft Certified: DevOps Engineer Expert</h3>
+                        <span class="cert-badge">Azure DevOps</span>
                     </div>
-                </div>
-                <div class="service-card reveal">
-                    <div class="service-icon">
-                        <i class="fas fa-chalkboard-teacher"></i>
+
+                    <!-- Kubernetes Certification -->
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fas fa-dharmachakra"></i></div>
+                        <h3>Certified Kubernetes Administrator (CKA)</h3>
+                        <span class="cert-badge">CNCF CKA</span>
                     </div>
-                    <h3>Technical Workshops & Training</h3>
-                    <p>Delivering hands-on workshops for colleges on Cloud Security, Blockchain technology, and Malware Analysis. Passionate about educating the next generation of engineers.</p>
-                    <div class="service-tags">
-                        <span class="service-tag">Cloud Security</span>
-                        <span class="service-tag">Blockchain</span>
-                        <span class="service-tag">Malware Analysis</span>
-                        <span class="service-tag">Training</span>
-                        <span class="service-tag">Workshops</span>
+
+                    <!-- Red Hat Certifications -->
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fas fa-server"></i></div>
+                        <h3>Red Hat Certified Engineer (RHCE) in Enterprise Linux</h3>
+                        <span class="cert-badge">RHCE</span>
+                    </div>
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fas fa-cogs"></i></div>
+                        <h3>Red Hat Certified Engineer in Ansible Automation</h3>
+                        <span class="cert-badge">RHCE - Ansible</span>
+                    </div>
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fas fa-linux"></i></div>
+                        <h3>Red Hat Certified System Administrator (RHCSA)</h3>
+                        <span class="cert-badge">RHCSA</span>
+                    </div>
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fas fa-cubes"></i></div>
+                        <h3>Red Hat Certified System Administrator in OpenShift</h3>
+                        <span class="cert-badge">RHCSA - OCP</span>
+                    </div>
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fas fa-box"></i></div>
+                        <h3>Red Hat Certified Specialist in Containers</h3>
+                        <span class="cert-badge">Containers</span>
+                    </div>
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fas fa-cube"></i></div>
+                        <h3>Red Hat Certified OpenShift Administrator</h3>
+                        <span class="cert-badge">OpenShift Admin</span>
+                    </div>
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fas fa-database"></i></div>
+                        <h3>Red Hat Certified Specialist in Ceph Cloud Storage</h3>
+                        <span class="cert-badge">Ceph Storage</span>
+                    </div>
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fas fa-hdd"></i></div>
+                        <h3>Red Hat Certified Specialist in OpenShift Data Foundation</h3>
+                        <span class="cert-badge">ODF</span>
+                    </div>
+                    <div class="cert-card reveal">
+                        <div class="cert-icon"><i class="fas fa-robot"></i></div>
+                        <h3>Red Hat Certified Developer in AI</h3>
+                        <span class="cert-badge">Red Hat AI</span>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- CONTACT SECTION -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2 class="reveal">Let's Work Together</h2>
-            <div class="contact-content reveal">
-                <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
-                    Interested in cloud consulting, DevOps solutions, or booking a technical workshop for your college? Let's connect and discuss how we can work together.
-                </p>
-                <div class="contact-links">
-                    <a href="mailto:abhicloud.cse@gamil.com" class="contact-link">
-                        <i class="fas fa-envelope"></i>
-                        <span>abhicloud.cse@gamil.com</span>
-                    </a>
-                    <a href="https://linkedin.com/in/abhixgupta/" target="_blank" class="contact-link">
-                        <i class="fab fa-linkedin"></i>
-                        <span>LinkedIn</span>
-                    </a>
-                    <a href="https://github.com/AbhixGupta" target="_blank" class="contact-link">
-                        <i class="fab fa-github"></i>
-                        <span>GitHub</span>
-                    </a>
+        <!-- SERVICES SECTION -->
+        <section id="services">
+            <div class="container">
+                <h2 class="reveal">Services & Expertise</h2>
+                <div class="services-grid">
+                    <div class="service-card reveal">
+                        <div class="service-icon">
+                            <i class="fas fa-cloud"></i>
+                        </div>
+                        <h3>Cloud & Container Orchestration</h3>
+                        <p>Expert in designing and deploying containerized applications using Kubernetes, OpenShift (OCP), Docker, and Podman with focus on scalability and high availability.</p>
+                        <div class="service-tags">
+                            <span class="service-tag">Kubernetes</span>
+                            <span class="service-tag">OpenShift</span>
+                            <span class="service-tag">Docker</span>
+                            <span class="service-tag">Podman</span>
+                            <span class="service-tag">AWS</span>
+                        </div>
+                    </div>
+                    <div class="service-card reveal">
+                        <div class="service-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3>Cloud Storage & Data Foundation</h3>
+                        <p>Specialized in Ceph storage solutions, OpenShift Data Foundation (ODF), and enterprise-grade persistent storage for cloud-native applications.</p>
+                        <div class="service-tags">
+                            <span class="service-tag">Ceph</span>
+                            <span class="service-tag">ODF</span>
+                            <span class="service-tag">Storage</span>
+                            <span class="service-tag">Backup</span>
+                            <span class="service-tag">S3</span>
+                        </div>
+                    </div>
+                    <div class="service-card reveal">
+                        <div class="service-icon">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                        <h3>DevOps & Automation</h3>
+                        <p>Infrastructure as Code, CI/CD pipelines, configuration management with Ansible, and automation across Linux, Git, GitHub, and GitLab environments.</p>
+                        <div class="service-tags">
+                            <span class="service-tag">Ansible</span>
+                            <span class="service-tag">Git</span>
+                            <span class="service-tag">GitHub</span>
+                            <span class="service-tag">GitLab</span>
+                            <span class="service-tag">Linux</span>
+                        </div>
+                    </div>
+                    <div class="service-card reveal">
+                        <div class="service-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h3>Technical Workshops & Training</h3>
+                        <p>Delivering hands-on workshops for colleges on Linux, Containerization, Cloud Computing, Kubernetes, Cloud Security, Blockchain, and Malware Analysis. Passionate about educating the next generation of engineers.</p>
+                        <div class="service-tags">
+                            <span class="service-tag">Linux</span>
+                            <span class="service-tag">Containerization</span>
+                            <span class="service-tag">Cloud Computing</span>
+                            <span class="service-tag">Kubernetes</span>
+                            <span class="service-tag">Cloud Security</span>
+                            <span class="service-tag">Blockchain</span>
+                            <span class="service-tag">Malware Analysis</span>
+                            <span class="service-tag">Training</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 All Rights Reserved. Built with <i class="fas fa-heart" style="color: var(--secondary-accent);"></i> and deployed on GitHub Pages</p>
-        </div>
-    </footer>
+        <!-- CONTACT SECTION -->
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2 class="reveal">Let's Work Together</h2>
+                <div class="contact-content reveal">
+                    <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
+                        Interested in cloud consulting, DevOps solutions, or booking a technical workshop for your college? Let's connect and discuss how we can work together.
+                    </p>
+                    <div class="contact-links">
+                        <a href="mailto:abhicloud.cse@gamil.com" class="contact-link">
+                            <i class="fas fa-envelope"></i>
+                            <span>abhicloud.cse@gamil.com</span>
+                        </a>
+                        <a href="https://linkedin.com/in/abhixgupta/" target="_blank" class="contact-link">
+                            <i class="fab fa-linkedin"></i>
+                            <span>LinkedIn</span>
+                        </a>
+                        <a href="https://github.com/AbhixGupta" target="_blank" class="contact-link">
+                            <i class="fab fa-github"></i>
+                            <span>GitHub</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <!-- JAVASCRIPT FOR SCROLL ANIMATIONS -->
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2026 Abhishek Gupta. All Rights Reserved. Built with <i class="fas fa-heart" style="color: var(--secondary-accent);"></i> and deployed on GitHub Pages</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JAVASCRIPT -->
     <script>
-        // Scroll reveal animation
+        // ===== EXPANDED TERMINAL COMMANDS (60+ commands) =====
+        const terminalCommands = [
+            // Kubernetes Commands
+            '$ kubectl get pods --all-namespaces',
+            '$ kubectl describe deployment nginx',
+            '$ kubectl apply -f deployment.yaml',
+            '$ kubectl logs -f pod/app-server-5f7d',
+            '$ kubectl exec -it app-pod -- /bin/bash',
+            '$ kubectl scale deployment app --replicas=5',
+            '$ kubectl port-forward svc/redis 6379:6379',
+            '$ kubectl get nodes -o wide',
+            '$ kubectl rollout status deployment/app',
+            '$ kubectl delete pod/error-pod --force',
+
+            // Docker Commands
+            '$ docker ps -a',
+            '$ docker build -t myapp:latest .',
+            '$ docker-compose up -d',
+            '$ docker logs -f container_name',
+            '$ docker exec -it redis /bin/sh',
+            '$ docker network ls',
+            '$ docker volume prune -f',
+            '$ docker images | grep myapp',
+            '$ docker pull nginx:alpine',
+            '$ docker system df',
+
+            // OpenShift Commands
+            '$ oc get routes',
+            '$ oc new-app nodejs~https://github.com/user/app',
+            '$ oc status --suggest',
+            '$ oc logs dc/myapp -f',
+            '$ oc expose svc/myservice',
+            '$ oc adm policy add-scc-to-user anyuid -z mysa',
+
+            // Ansible Commands
+            '$ ansible-playbook deploy.yml -i inventory',
+            '$ ansible all -m ping',
+            '$ ansible-vault encrypt secrets.yml',
+            '$ ansible-playbook site.yml --check',
+            '$ ansible-galaxy install geerlingguy.docker',
+
+            // Terraform Commands
+            '$ terraform init',
+            '$ terraform plan',
+            '$ terraform apply -auto-approve',
+            '$ terraform destroy',
+            '$ terraform state list',
+            '$ terraform workspace select prod',
+
+            // Helm Commands
+            '$ helm install redis ./charts/redis',
+            '$ helm upgrade app-release ./charts',
+            '$ helm list --all-namespaces',
+            '$ helm rollback app-release 1',
+            '$ helm repo update',
+
+            // AWS CLI Commands
+            '$ aws s3 ls s3://my-bucket',
+            '$ aws ec2 describe-instances',
+            '$ aws eks update-kubeconfig --name cluster',
+            '$ aws ecr get-login-password',
+            '$ aws cloudformation describe-stacks',
+
+            // Git Commands
+            '$ git status',
+            '$ git push origin main',
+            '$ git checkout -b feature/new-api',
+            '$ git rebase -i HEAD~5',
+            '$ git log --oneline --graph',
+            '$ git cherry-pick abc123',
+
+            // Ceph Commands
+            '$ ceph health detail',
+            '$ ceph osd tree',
+            '$ ceph df',
+            '$ radosgw-admin user info --uid=admin',
+
+            // Linux System Commands
+            '$ systemctl status kubelet',
+            '$ journalctl -u docker -f',
+            '$ top -c',
+            '$ htop',
+            '$ netstat -tulpn | grep LISTEN',
+            '$ ss -tulwn',
+            '$ ps aux | grep nginx',
+            '$ df -h',
+            '$ free -m',
+            '$ cat /proc/cpuinfo | grep processor',
+            '$ lsblk',
+            '$ uptime',
+
+            // Development Commands
+            '$ npm run build',
+            '$ python manage.py migrate',
+            '$ go build -o app main.go',
+            '$ cargo run --release',
+            '$ make install',
+
+            // Network/Security Commands
+            '$ ssh user@prod-server-01',
+            '$ scp file.tar.gz user@server:/tmp/',
+            '$ curl -X POST https://api.example.com/v1',
+            '$ wget https://releases.example.com/app.tar.gz',
+            '$ nmap -sV 192.168.1.0/24',
+            '$ tcpdump -i eth0 port 80',
+
+            // File/Editor Commands
+            '$ vi /etc/kubernetes/manifests/kube-apiserver.yaml',
+            '$ tail -f /var/log/syslog',
+            '$ grep -r "ERROR" /var/log/',
+            '$ find . -name "*.log" -mtime +7 -delete',
+            '$ chmod +x deploy.sh',
+            '$ chown -R app:app /var/www',
+
+            // Environment/Config Commands
+            '$ source .env',
+            '$ export KUBECONFIG=~/.kube/config',
+            '$ echo $PATH',
+            '$ printenv | grep AWS',
+        ];
+
+        // ===== FLOATING TERMINAL CODE =====
+        function createFloatingTerminal() {
+            const terminal = document.createElement('div');
+            terminal.className = 'terminal-code';
+            terminal.textContent = terminalCommands[Math.floor(Math.random() * terminalCommands.length)];
+
+            // Random starting position
+            terminal.style.left = Math.random() * (window.innerWidth - 400) + 'px';
+            terminal.style.top = window.innerHeight + 'px'; // Start below viewport
+
+            document.body.appendChild(terminal);
+
+            // Animation - float upward
+            const duration = 15000 + Math.random() * 10000; // 15-25 seconds
+            const startY = window.innerHeight;
+            const endY = -100;
+            const startX = parseFloat(terminal.style.left);
+            const drift = (Math.random() - 0.5) * 100; // Slight horizontal drift
+
+            const startTime = Date.now();
+
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = elapsed / duration;
+
+                if (progress < 1) {
+                    terminal.style.top = startY + (endY - startY) * progress + 'px';
+                    terminal.style.left = startX + drift * progress + 'px';
+                    terminal.style.opacity = Math.max(0, 1 - progress);
+                    requestAnimationFrame(animate);
+                } else {
+                    terminal.remove();
+                }
+            }
+
+            animate();
+        }
+
+        // Create floating terminal code every 2.5 seconds
+        setInterval(createFloatingTerminal, 2500);
+
+        // Create initial batch
+        for (let i = 0; i < 6; i++) {
+            setTimeout(createFloatingTerminal, i * 500);
+        }
+
+        // ===== 3D PARTICLE NETWORK =====
+        let scene, camera, renderer;
+        let particles = [];
+        let particlePositions;
+        let linesMesh;
+        let mouseX = 0, mouseY = 0;
+
+        function init3D() {
+            const canvas = document.getElementById('three-canvas');
+
+            // Scene
+            scene = new THREE.Scene();
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                1,
+                1000
+            );
+            camera.position.z = 100;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                alpha: true,
+                antialias: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Create particle network
+            createParticleNetwork();
+
+            // Mouse parallax
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            // Window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            // Random lightning
+            setInterval(triggerLightning, 10000 + Math.random() * 10000);
+
+            animate3D();
+        }
+
+        function createParticleNetwork() {
+            const particleCount = 150;
+            const geometry = new THREE.BufferGeometry();
+            particlePositions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const velocities = [];
+
+            // Create particles
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+
+                // Random positions
+                particlePositions[i3] = (Math.random() - 0.5) * 200;
+                particlePositions[i3 + 1] = (Math.random() - 0.5) * 200;
+                particlePositions[i3 + 2] = (Math.random() - 0.5) * 100;
+
+                // Colors (cyan to magenta gradient)
+                const color = new THREE.Color();
+                color.setHSL(Math.random() * 0.3 + 0.5, 1.0, 0.5);
+                colors[i3] = color.r;
+                colors[i3 + 1] = color.g;
+                colors[i3 + 2] = color.b;
+
+                // Velocities
+                velocities.push({
+                    x: (Math.random() - 0.5) * 0.05,
+                    y: (Math.random() - 0.5) * 0.05,
+                    z: (Math.random() - 0.5) * 0.02
+                });
+
+                particles.push({ velocity: velocities[i] });
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 2,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particleSystem = new THREE.Points(geometry, material);
+            scene.add(particleSystem);
+
+            // Create lines for connections
+            const maxConnections = particleCount * 3;
+            const linePositions = new Float32Array(maxConnections * 2 * 3);
+            const lineColors = new Float32Array(maxConnections * 2 * 3);
+
+            const lineGeometry = new THREE.BufferGeometry();
+            lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+            lineGeometry.setAttribute('color', new THREE.BufferAttribute(lineColors, 3));
+
+            const lineMaterial = new THREE.LineBasicMaterial({
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.15,
+                blending: THREE.AdditiveBlending
+            });
+
+            linesMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
+            scene.add(linesMesh);
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+
+            const positions = scene.children[0].geometry.attributes.position.array;
+            const linePositions = linesMesh.geometry.attributes.position.array;
+            const lineColors = linesMesh.geometry.attributes.color.array;
+
+            let vertexpos = 0;
+            let colorpos = 0;
+            const maxDistance = 50;
+
+            // Update particle positions
+            for (let i = 0; i < particles.length; i++) {
+                const i3 = i * 3;
+
+                positions[i3] += particles[i].velocity.x;
+                positions[i3 + 1] += particles[i].velocity.y;
+                positions[i3 + 2] += particles[i].velocity.z;
+
+                // Boundary check
+                if (Math.abs(positions[i3]) > 100) particles[i].velocity.x *= -1;
+                if (Math.abs(positions[i3 + 1]) > 100) particles[i].velocity.y *= -1;
+                if (Math.abs(positions[i3 + 2]) > 50) particles[i].velocity.z *= -1;
+            }
+
+            // Draw connections between nearby particles
+            for (let i = 0; i < particles.length; i++) {
+                const i3 = i * 3;
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    const j3 = j * 3;
+
+                    const dx = positions[i3] - positions[j3];
+                    const dy = positions[i3 + 1] - positions[j3 + 1];
+                    const dz = positions[i3 + 2] - positions[j3 + 2];
+                    const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    if (distance < maxDistance) {
+                        const alpha = 1.0 - (distance / maxDistance);
+
+                        // Line from particle i to j
+                        linePositions[vertexpos++] = positions[i3];
+                        linePositions[vertexpos++] = positions[i3 + 1];
+                        linePositions[vertexpos++] = positions[i3 + 2];
+
+                        linePositions[vertexpos++] = positions[j3];
+                        linePositions[vertexpos++] = positions[j3 + 1];
+                        linePositions[vertexpos++] = positions[j3 + 2];
+
+                        // Colors
+                        const color = new THREE.Color(0x00d4ff);
+                        lineColors[colorpos++] = color.r;
+                        lineColors[colorpos++] = color.g;
+                        lineColors[colorpos++] = color.b;
+
+                        lineColors[colorpos++] = color.r;
+                        lineColors[colorpos++] = color.g;
+                        lineColors[colorpos++] = color.b;
+                    }
+                }
+            }
+
+            // Update buffers
+            scene.children[0].geometry.attributes.position.needsUpdate = true;
+            linesMesh.geometry.setDrawRange(0, vertexpos / 3);
+            linesMesh.geometry.attributes.position.needsUpdate = true;
+            linesMesh.geometry.attributes.color.needsUpdate = true;
+
+            // Mouse parallax
+            camera.position.x += (mouseX * 10 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 10 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            // Slow rotation
+            scene.rotation.y += 0.0002;
+
+            renderer.render(scene, camera);
+        }
+
+        function triggerLightning() {
+            const flash = document.getElementById('lightningFlash');
+
+            // Flash sequence
+            flash.classList.add('active');
+            setTimeout(() => flash.classList.remove('active'), 40);
+            setTimeout(() => flash.classList.add('active'), 80);
+            setTimeout(() => flash.classList.remove('active'), 120);
+            setTimeout(() => flash.classList.add('active'), 160);
+            setTimeout(() => flash.classList.remove('active'), 180);
+        }
+
+        // ===== SCROLL REVEAL =====
         function reveal() {
             const reveals = document.querySelectorAll('.reveal');
             reveals.forEach(element => {
                 const windowHeight = window.innerHeight;
                 const elementTop = element.getBoundingClientRect().top;
-                const elementVisible = 150;
+                const elementVisible = 100;
 
                 if (elementTop < windowHeight - elementVisible) {
                     element.classList.add('active');
@@ -838,10 +1379,17 @@
             });
         }
 
-        window.addEventListener('scroll', reveal);
-        reveal(); // Initial check
+        // ===== NAVBAR SCROLL =====
+        function handleNavbar() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }
 
-        // Smooth scroll for navigation links
+        // ===== SMOOTH SCROLL =====
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -855,25 +1403,20 @@
             });
         });
 
-        // Add active class to nav links on scroll
+        // ===== EVENT LISTENERS =====
         window.addEventListener('scroll', () => {
-            let current = '';
-            const sections = document.querySelectorAll('section');
+            reveal();
+            handleNavbar();
+        });
 
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (scrollY >= (sectionTop - 200)) {
-                    current = section.getAttribute('id');
-                }
-            });
+        // ===== INITIALIZE =====
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 1000);
 
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').slice(1) === current) {
-                    link.classList.add('active');
-                }
-            });
+            init3D();
+            reveal();
         });
     </script>
 </body>
