@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio of a Cloud & Infrastructure Engineer specializing in Kubernetes, OpenShift, and DevOps">
+    <title>Portfolio | Cloud & Infrastructure Engineer</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== VARIABLES ===== */
+        :root {
+            --primary-accent: #00d4ff;
+            --secondary-accent: #ff0080;
+            --bg-dark: #0a0a0a;
+            --bg-darker: #050505;
+            --bg-card: #151515;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #707070;
+            --border-color: #252525;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        h1, h2, h3, h4 {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+            border-radius: 2px;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* ===== HEADER/NAVIGATION ===== */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 100%);
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 128, 0.1) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--primary-accent);
+            border-radius: 50px;
+            color: var(--primary-accent);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            background: linear-gradient(135deg, #ffffff 0%, var(--primary-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 1.5rem auto 3rem;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: var(--transition);
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
+        }
+
+        /* ===== SECTIONS ===== */
+        section {
+            padding: 6rem 0;
+        }
+
+        section:nth-child(even) {
+            background: var(--bg-darker);
+        }
+
+        /* ===== ABOUT SECTION ===== */
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .about-content p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-content .highlight {
+            color: var(--primary-accent);
+            font-weight: 600;
+        }
+
+        /* ===== CERTIFICATIONS SECTION ===== */
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .cert-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cert-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
+        }
+
+        .cert-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .cert-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-accent);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .cert-icon {
+            font-size: 2.5rem;
+            color: var(--primary-accent);
+            margin-bottom: 1rem;
+        }
+
+        .cert-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .cert-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--primary-accent);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--primary-accent);
+            margin-top: 0.5rem;
+        }
+
+        /* ===== SERVICES SECTION ===== */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .service-card:hover {
+            border-color: var(--primary-accent);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .service-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .service-tag {
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== TECH STACK SECTION ===== */
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        .tech-item {
+            padding: 0.8rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tech-item i {
+            color: var(--primary-accent);
+            font-size: 1.2rem;
+        }
+
+        .tech-item:hover {
+            border-color: var(--primary-accent);
+            background: rgba(0, 212, 255, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
+
+        /* ===== CONTACT SECTION ===== */
+        .contact {
+            text-align: center;
+        }
+
+        .contact-content {
+            max-width: 600px;
+            margin: 3rem auto 0;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .contact-link i {
+            font-size: 1.5rem;
+            color: var(--primary-accent);
+        }
+
+        .contact-link:hover {
+            border-color: var(--primary-accent);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--bg-darker);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-links a {
+                font-size: 0.9rem;
+            }
+
+            section {
+                padding: 4rem 0;
+            }
+
+            .cert-grid,
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-links {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .nav .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.8rem;
+            }
+        }
+
+        /* ===== SCROLL REVEAL ANIMATION ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="container">
+            <a href="#" class="logo">Abhishek Gupta</a>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#techstack">Tech Stack</a></li>
+                <li><a href="#certifications">Certifications</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="home">
+        <div class="container hero-content">
+            <span class="hero-tag">Freelancer | Workshop Instructor</span>
+            <h1>Cloud & Infrastructure<br>Engineer</h1>
+            <p>Architecting resilient cloud infrastructure, container orchestration, and delivering technical workshops on Cloud Security, Blockchain, and Malware Analysis.</p>
+            <a href="#contact" class="cta-button">Let's Connect <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about">
+        <div class="container">
+            <div class="about-content reveal">
+                <h2>About Me</h2>
+                <p>
+                    I'm a Cloud & Infrastructure Engineer specializing in container orchestration, cloud infrastructure, and storage solutions.
+                    My expertise spans <span class="highlight">Kubernetes, OpenShift, Ceph, and AWS</span>, with a deep focus on building
+                    resilient, scalable enterprise systems. Currently working at <span class="highlight">Red Hat</span>, I architect and
+                    implement cutting-edge cloud-native solutions.
+                </p>
+                <p>
+                    As a freelancer, I'm passionate about sharing knowledge through <span class="highlight">technical workshops for colleges</span>,
+                    covering topics like Cloud Security, Blockchain, and Malware Analysis. With certifications from Red Hat, AWS, Microsoft Azure,
+                    and the Cloud Native Computing Foundation, I bring comprehensive expertise across multiple cloud platforms and DevOps technologies.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- TECH STACK SECTION -->
+    <section id="techstack">
+        <div class="container">
+            <h2 class="reveal">Tech Stack</h2>
+            <div class="tech-stack reveal">
+                <div class="tech-item"><i class="fab fa-docker"></i> Docker</div>
+                <div class="tech-item"><i class="fas fa-cube"></i> Podman</div>
+                <div class="tech-item"><i class="fab fa-linux"></i> Linux</div>
+                <div class="tech-item"><i class="fab fa-git-alt"></i> Git</div>
+                <div class="tech-item"><i class="fab fa-github"></i> GitHub</div>
+                <div class="tech-item"><i class="fab fa-gitlab"></i> GitLab</div>
+                <div class="tech-item"><i class="fas fa-dharmachakra"></i> Kubernetes</div>
+                <div class="tech-item"><i class="fab fa-redhat"></i> OpenShift (OCP)</div>
+                <div class="tech-item"><i class="fas fa-database"></i> Ceph</div>
+                <div class="tech-item"><i class="fas fa-hdd"></i> ODF</div>
+                <div class="tech-item"><i class="fab fa-aws"></i> AWS</div>
+                <div class="tech-item"><i class="fas fa-cloud"></i> Cloud Computing</div>
+                <div class="tech-item"><i class="fas fa-shield-alt"></i> Cloud Security</div>
+                <div class="tech-item"><i class="fas fa-link"></i> Blockchain</div>
+                <div class="tech-item"><i class="fas fa-bug"></i> Malware Analysis</div>
+                <div class="tech-item"><i class="fas fa-cogs"></i> Ansible</div>
+                <div class="tech-item"><i class="fab fa-python"></i> Python</div>
+                <div class="tech-item"><i class="fas fa-terminal"></i> Bash</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CERTIFICATIONS SECTION -->
+    <section id="certifications">
+        <div class="container">
+            <h2 class="reveal">Certifications</h2>
+            <div class="cert-grid">
+                <!-- AWS Certifications -->
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fab fa-aws"></i></div>
+                    <h3>AWS Certified Solutions Architect Associate</h3>
+                    <span class="cert-badge">AWS SAA</span>
+                </div>
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fab fa-aws"></i></div>
+                    <h3>AWS Certified Cloud Practitioner</h3>
+                    <span class="cert-badge">AWS CCP</span>
+                </div>
+
+                <!-- Microsoft Azure Certifications -->
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fab fa-microsoft"></i></div>
+                    <h3>Microsoft Certified: Azure Administrator Associate</h3>
+                    <span class="cert-badge">Azure Admin</span>
+                </div>
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fab fa-microsoft"></i></div>
+                    <h3>Microsoft Certified: DevOps Engineer Expert</h3>
+                    <span class="cert-badge">Azure DevOps</span>
+                </div>
+
+                <!-- Kubernetes Certification -->
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fas fa-dharmachakra"></i></div>
+                    <h3>Certified Kubernetes Administrator (CKA)</h3>
+                    <span class="cert-badge">CNCF CKA</span>
+                </div>
+
+                <!-- Red Hat Certifications -->
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fas fa-server"></i></div>
+                    <h3>Red Hat Certified Engineer (RHCE) in Enterprise Linux</h3>
+                    <span class="cert-badge">RHCE</span>
+                </div>
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fas fa-cogs"></i></div>
+                    <h3>Red Hat Certified Engineer in Ansible Automation</h3>
+                    <span class="cert-badge">RHCE - Ansible</span>
+                </div>
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fas fa-linux"></i></div>
+                    <h3>Red Hat Certified System Administrator (RHCSA)</h3>
+                    <span class="cert-badge">RHCSA</span>
+                </div>
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fas fa-cubes"></i></div>
+                    <h3>Red Hat Certified System Administrator in OpenShift</h3>
+                    <span class="cert-badge">RHCSA - OCP</span>
+                </div>
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fas fa-box"></i></div>
+                    <h3>Red Hat Certified Specialist in Containers</h3>
+                    <span class="cert-badge">Containers</span>
+                </div>
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fas fa-cube"></i></div>
+                    <h3>Red Hat Certified OpenShift Administrator</h3>
+                    <span class="cert-badge">OpenShift Admin</span>
+                </div>
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fas fa-database"></i></div>
+                    <h3>Red Hat Certified Specialist in Ceph Cloud Storage</h3>
+                    <span class="cert-badge">Ceph Storage</span>
+                </div>
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fas fa-hdd"></i></div>
+                    <h3>Red Hat Certified Specialist in OpenShift Data Foundation</h3>
+                    <span class="cert-badge">ODF</span>
+                </div>
+                <div class="cert-card reveal">
+                    <div class="cert-icon"><i class="fas fa-robot"></i></div>
+                    <h3>Red Hat Certified Developer in AI</h3>
+                    <span class="cert-badge">Red Hat AI</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES SECTION -->
+    <section id="services">
+        <div class="container">
+            <h2 class="reveal">Services & Expertise</h2>
+            <div class="services-grid">
+                <div class="service-card reveal">
+                    <div class="service-icon">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h3>Cloud & Container Orchestration</h3>
+                    <p>Expert in designing and deploying containerized applications using Kubernetes, OpenShift (OCP), Docker, and Podman with focus on scalability and high availability.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">Kubernetes</span>
+                        <span class="service-tag">OpenShift</span>
+                        <span class="service-tag">Docker</span>
+                        <span class="service-tag">Podman</span>
+                        <span class="service-tag">AWS</span>
+                    </div>
+                </div>
+                <div class="service-card reveal">
+                    <div class="service-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>Cloud Storage & Data Foundation</h3>
+                    <p>Specialized in Ceph storage solutions, OpenShift Data Foundation (ODF), and enterprise-grade persistent storage for cloud-native applications.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">Ceph</span>
+                        <span class="service-tag">ODF</span>
+                        <span class="service-tag">Storage</span>
+                        <span class="service-tag">Backup</span>
+                        <span class="service-tag">S3</span>
+                    </div>
+                </div>
+                <div class="service-card reveal">
+                    <div class="service-icon">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+                    <h3>DevOps & Automation</h3>
+                    <p>Infrastructure as Code, CI/CD pipelines, configuration management with Ansible, and automation across Linux, Git, GitHub, and GitLab environments.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">Ansible</span>
+                        <span class="service-tag">Git</span>
+                        <span class="service-tag">GitHub</span>
+                        <span class="service-tag">GitLab</span>
+                        <span class="service-tag">Linux</span>
+                    </div>
+                </div>
+                <div class="service-card reveal">
+                    <div class="service-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3>Technical Workshops & Training</h3>
+                    <p>Delivering hands-on workshops for colleges on Cloud Security, Blockchain technology, and Malware Analysis. Passionate about educating the next generation of engineers.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">Cloud Security</span>
+                        <span class="service-tag">Blockchain</span>
+                        <span class="service-tag">Malware Analysis</span>
+                        <span class="service-tag">Training</span>
+                        <span class="service-tag">Workshops</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="reveal">Let's Work Together</h2>
+            <div class="contact-content reveal">
+                <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">
+                    Interested in cloud consulting, DevOps solutions, or booking a technical workshop for your college? Let's connect and discuss how we can work together.
+                </p>
+                <div class="contact-links">
+                    <a href="mailto:abhicloud.cse@gamil.com" class="contact-link">
+                        <i class="fas fa-envelope"></i>
+                        <span>abhicloud.cse@gamil.com</span>
+                    </a>
+                    <a href="https://linkedin.com/in/abhixgupta/" target="_blank" class="contact-link">
+                        <i class="fab fa-linkedin"></i>
+                        <span>LinkedIn</span>
+                    </a>
+                    <a href="https://github.com/AbhixGupta" target="_blank" class="contact-link">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 All Rights Reserved. Built with <i class="fas fa-heart" style="color: var(--secondary-accent);"></i> and deployed on GitHub Pages</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT FOR SCROLL ANIMATIONS -->
+    <script>
+        // Scroll reveal animation
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(element => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', reveal);
+        reveal(); // Initial check
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add active class to nav links on scroll
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const sections = document.querySelectorAll('section');
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
